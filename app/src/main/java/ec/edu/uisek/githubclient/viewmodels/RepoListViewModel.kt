@@ -19,6 +19,8 @@ class RepoListViewModel : ViewModel() {
     private val _errorMsg = MutableStateFlow<String?>(value = null)
     val errorMsg: StateFlow<String?> = _errorMsg.asStateFlow()
 
+    private val deletingRepos = mutableSetOf<String>()
+
     init {
         fetchRepos()
     }
@@ -35,6 +37,37 @@ class RepoListViewModel : ViewModel() {
                 e.printStackTrace()
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteRepository(owner: String, repoName: String) {
+        val repoKey = "$owner/$repoName"
+        if (deletingRepos.contains(repoKey)) return
+
+        deletingRepos.add(repoKey)
+        viewModelScope.launch {
+            _errorMsg.value = null
+            try {
+                val response = RetrofitClient.apiService.deleteRepository(owner, repoName)
+                
+                if (response.isSuccessful) {
+                    fetchRepos()
+                } else {
+                    val code = response.code()
+                    if (code == 404) {
+                        _errorMsg.value = "Error 404 en '$owner/$repoName': No encontrado. Verifica el permiso 'delete_repo'."
+                    } else {
+                        _errorMsg.value = "Error $code al borrar '$repoName': ${response.message()}"
+                    }
+                    fetchRepos() // Restaurar item
+                }
+            } catch (e: Exception) {
+                _errorMsg.value = "Error de red: ${e.localizedMessage}"
+                e.printStackTrace()
+                fetchRepos() // Restaurar item
+            } finally {
+                deletingRepos.remove(repoKey)
             }
         }
     }

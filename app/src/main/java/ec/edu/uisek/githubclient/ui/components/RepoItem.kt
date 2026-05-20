@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,13 +27,11 @@ import coil.compose.AsyncImage
 import ec.edu.uisek.githubclient.models.GithubUser
 import ec.edu.uisek.githubclient.models.Repository
 import ec.edu.uisek.githubclient.ui.theme.GithubClientTheme
-import org.intellij.lang.annotations.Language
-import org.w3c.dom.Text
 
 @Composable
-
 fun RepoItem (
-    repository: Repository
+    repository: Repository,
+    onEditClick: () -> Unit = {}
 ) {
     Card (
         modifier = Modifier.padding(all = 8.dp).fillMaxWidth(),
@@ -38,12 +40,13 @@ fun RepoItem (
         Row (
             modifier = Modifier.padding(all = 16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
-        ) { AsyncImage(
+        ) { 
+            AsyncImage(
                 model = repository.owner.avatarUrl,
                 contentDescription = repository.name,
                 modifier = Modifier.size( size = 60.dp),
                 contentScale = ContentScale.Crop
-                )
+            )
             Spacer(modifier = Modifier.width(width = 16.dp))
             Column(modifier = Modifier.weight(weight = 1f)) {
                 Text(
@@ -59,13 +62,13 @@ fun RepoItem (
                         maxLines = 3
                     )
                 }
-                Spacer(modifier = Modifier.height(height = 4.dp))
-                if (!repository.language.isNullOrBlank()) {
-                    Text(
-                        text = repository.language,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+            }
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar repositorio",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

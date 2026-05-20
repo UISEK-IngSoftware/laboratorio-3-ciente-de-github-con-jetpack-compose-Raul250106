@@ -1,7 +1,5 @@
 package ec.edu.uisek.githubclient.services
 
-//import ec.edu.uisek.githubclientcompose.BuildConfig
-import androidx.compose.ui.geometry.isEmpty
 import ec.edu.uisek.githubclient.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,11 +17,11 @@ object RetrofitClient {
         .addInterceptor(logging)
         .addInterceptor { chain ->
             val token = BuildConfig.GITHUB_TOKEN
-            println("DEBUG_TOKEN: Es vacío? ${token.isEmpty()}") // No imprimas el token completo por seguridad
-            println("DEBUG_TOKEN: Longitud ${token.length}")
-
+            
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token") // Asegúrate de que hay un espacio después de Bearer
+                .addHeader("Authorization", "Bearer $token")
+                .addHeader("Accept", "application/vnd.github+json")
+                .addHeader("X-GitHub-Api-Version", "2022-11-28")
                 .build()
             chain.proceed(request)
         }
