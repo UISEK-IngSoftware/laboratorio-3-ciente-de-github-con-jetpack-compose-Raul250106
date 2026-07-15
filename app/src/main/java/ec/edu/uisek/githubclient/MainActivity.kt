@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ec.edu.uisek.githubclient.models.Repository
+import ec.edu.uisek.githubclient.services.AuthService
+import ec.edu.uisek.githubclient.ui.screens.LoginForm
 import ec.edu.uisek.githubclient.ui.screens.RepoForm
 import ec.edu.uisek.githubclient.ui.screens.RepoList
 import ec.edu.uisek.githubclient.ui.theme.GithubClientTheme
@@ -26,18 +28,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val authService = AuthService(context = this)
         setContent {
             GithubClientTheme {
                 val listViewModel: RepoListViewModel = viewModel()
 
-                var currentScreen by remember { mutableStateOf("repoList") }
+                var currentScreen by remember { mutableStateOf(if (authService.isLoggedIn()) "repoList" else "login") }
                 var selectedRepo by remember { mutableStateOf<Repository?>(null) }
 
                 when (currentScreen) {
-                    "repoList" -> RepoList(
+                    "login" -> LoginForm (
+                        onLoginSuccess = {currentScreen = "repoList"}
+                    )
+                    "repoList" -> RepoList (
                         onNavigateToForm = { repo ->
                             selectedRepo = repo
                             currentScreen = "repoForm"
+                        },
+                        onLogout = {
+                            authService.logout()
+                            currentScreen = "login"
                         }
                     )
                     "repoForm" -> RepoForm(

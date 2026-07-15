@@ -18,12 +18,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ec.edu.uisek.githubclient.services.AuthService
 import ec.edu.uisek.githubclient.ui.theme.GithubClientTheme
 
 @Composable
-fun LoginForm(){
+fun LoginForm(
+    onLoginSuccess: () -> Unit = {}
+){
+    val context = LocalContext.current
+    val authService = remember { AuthService(context) }
     var username by remember { mutableStateOf(value = "") }
     var token by remember { mutableStateOf(value = "") }
     Column (
@@ -51,11 +58,15 @@ fun LoginForm(){
             onValueChange = {token = it},
             label = {Text(text="Token de github")},
             modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true
         )
         Spacer(modifier = Modifier.height(height = 16.dp))
         Button(
-            onClick = {},
+            onClick = {
+                authService.saveAuth(username, token)
+                onLoginSuccess()
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = username.isNotBlank() && token.isNotBlank()
         ) {

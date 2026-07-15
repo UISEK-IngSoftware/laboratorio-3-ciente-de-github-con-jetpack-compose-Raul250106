@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,7 +32,8 @@ import ec.edu.uisek.githubclient.ui.theme.GithubClientTheme
 @Composable
 fun RepoItem (
     repository: Repository,
-    onEditClick: () -> Unit = {}
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Card (
         modifier = Modifier.padding(all = 8.dp).fillMaxWidth(),
@@ -44,7 +46,7 @@ fun RepoItem (
             AsyncImage(
                 model = repository.owner.avatarUrl,
                 contentDescription = repository.name,
-                modifier = Modifier.size( size = 60.dp),
+                modifier = Modifier.size(size = 60.dp),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(width = 16.dp))
@@ -59,16 +61,25 @@ fun RepoItem (
                     Text(
                         text = repository.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 3
+                        maxLines = 2
                     )
                 }
             }
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Editar repositorio",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            Row {
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar repositorio",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar repositorio",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
@@ -89,8 +100,6 @@ fun RepoItemPreview(){
             description = "Jetpack Compose",
             language = "Kotlin"
         )
-        RepoItem(
-            repository
-        )
+        RepoItem(repository)
     }
 }
