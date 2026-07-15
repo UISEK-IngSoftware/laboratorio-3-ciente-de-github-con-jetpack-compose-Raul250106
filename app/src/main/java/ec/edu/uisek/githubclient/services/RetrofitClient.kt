@@ -19,6 +19,9 @@ object RetrofitClient {
             val token = BuildConfig.GITHUB_TOKEN
             
             val request = chain.request().newBuilder()
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .header("Pragma", "no-cache") // Para compatibilidad con HTTP 1.0
+                .header("Expires", "0")
                 .addHeader("Authorization", "Bearer $token")
                 .addHeader("Accept", "application/vnd.github+json")
                 .addHeader("X-GitHub-Api-Version", "2022-11-28")
