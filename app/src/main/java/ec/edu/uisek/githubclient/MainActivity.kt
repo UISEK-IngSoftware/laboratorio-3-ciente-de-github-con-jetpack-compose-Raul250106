@@ -24,10 +24,16 @@ import ec.edu.uisek.githubclient.ui.screens.RepoList
 import ec.edu.uisek.githubclient.ui.theme.GithubClientTheme
 import ec.edu.uisek.githubclient.viewmodels.RepoListViewModel
 
+import ec.edu.uisek.githubclient.services.RetrofitClient
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // INICIALIZACIÓN CRÍTICA: Permite que el cliente de red acceda al token guardado
+        RetrofitClient.init(this)
+        
         val authService = AuthService(context = this)
         setContent {
             GithubClientTheme {
@@ -38,7 +44,11 @@ class MainActivity : ComponentActivity() {
 
                 when (currentScreen) {
                     "login" -> LoginForm (
-                        onLoginSuccess = {currentScreen = "repoList"}
+                        onLoginSuccess = {
+                            // Al entrar, forzamos la carga de los repos del nuevo usuario
+                            listViewModel.fetchRepos()
+                            currentScreen = "repoList"
+                        }
                     )
                     "repoList" -> RepoList (
                         onNavigateToForm = { repo ->
